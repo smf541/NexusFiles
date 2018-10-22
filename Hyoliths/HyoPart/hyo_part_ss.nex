@@ -78,7 +78,7 @@ BEGIN MRBAYES;
   
   outgroup Loxosomella;
   
-  mcmcp ngen=500000 samplefreq=500 nruns=4 nchains=8 burninfrac=0.1 append=no;
+  mcmcp ngen=5000000 samplefreq=500 nruns=4 nchains=8 burninfrac=0.1 append=no;
   [mcmcp ngen=5000000 append=yes;]
   [mcmcp ngen=500000 append=no;]
   
