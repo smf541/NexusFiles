@@ -1,0 +1,27 @@
+---
+title: "Automating partitioning analyses"
+output: html_notebook
+---
+
+
+```{r compiling ln(ML) values from .ss files}
+#set current working directory
+setwd("C:\\Users\\dxsb43\\GitHub\\NexusFiles\\ss_outputs")
+
+#read in ss output file
+df <- read.table("weev_unpart_ss.nex.ss", header=TRUE, skip=6)
+df
+
+#first check that aSplitX is < or == 0.1
+if (df$aSplit0[40] > 0.1) {
+  print("Runs have not converged")
+}
+
+#check if any values in columns run1 - runn are positive
+if (dat[rowSums(dat[grepl("^run",names(dat))]>0)>0,] > 0) {
+  print("Positive log likelihood found")
+}
+
+```
+
+
