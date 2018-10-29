@@ -13,12 +13,12 @@ df <- read.table("weev_unpart_ss.nex.ss", header=TRUE, skip=6)
 df
 
 #first check that aSplitX is < or == 0.1
-if (df$aSplit0[40] > 0.1) {
+if (df$aSplit0[40] > -1) {
   print("Runs have not converged")
 }
 
 #check if any values in columns run1 - runn are positive
-if (dat[rowSums(dat[grepl("^run",names(dat))]>0)>0,] > 0) {
+if (any(sign(df[,2]) > -1)) {
   print("Positive log likelihood found")
 }
 
