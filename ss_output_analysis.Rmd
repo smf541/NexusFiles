@@ -5,23 +5,153 @@ output: html_notebook
 
 
 ```{r compiling ln(ML) values from .ss files}
-#set current working directory
-setwd("C:\\Users\\dxsb43\\GitHub\\NexusFiles\\ss_outputs")
+#move .nex.ss files from hamilton into ss_outputs folder
+#by hand
 
-#read in ss output file
-df <- read.table("weev_unpart_ss.nex.ss", header=TRUE, skip=6)
+#read in ss output file    --turn this into a function with procedural df name and file as                                                         variable--
+file.exists(".//ss_outputs//weev_unpart_ss.nex.ss")
+df <- read.table(".//ss_outputs//weev_unpart_ss.nex.ss", header=TRUE, skip=6)
 df
 
-#first check that aSplitX is < or == 0.1
-if (df$aSplit0[40] > -1) {
-  print("Runs have not converged")
+#function for checking the ss data frame
+check.ss <- function(x) {
+  if (x$aSplit0[40] > -1) {
+    print("Runs have not converged")
+  } # do higher ngen, see how many steps converge
+  else if (any(sign(df[,3:6]) > -1)) {
+    print("Positive log likelihood found")
+  }
+  else {
+    print("All good!")
+  }
 }
 
-#check if any values in columns run1 - runn are positive
-if (any(sign(df[,2]) > -1)) {
-  print("Positive log likelihood found")
+check.ss(df)
+```
+
+
+```{r make dataframe of ss results}
+require(miscTools)
+#using df of ln(ML) from chunk 1:
+
+#function for summing run columns
+sum.ln.ml <- function(x) { #x=filename
+  df <- read.table(x, header=TRUE, skip=6)
+  apply(df[,3:6], 2, sum)
 }
+
+#function for finding mean ln marginal likelihood
+mean.ln.ml <- function(x) {
+  mean(sum.ln.ml(x)) #use geometric mean
+}
+
+mean.ln.ml(df)
+
+###build data frame from .ss outputs###
+#find unique filenames of .nex.ss files
+filenames <- unique(basename(list.files(pattern=".nex.ss$", recursive=TRUE)))
+filenames
+
+#make vector of folders to iterate over  ---- have to make sure this is what the folders are                                            actually called when it comes to proper analysis ----
+folder.name <- unique(gsub("_.+_ss.nex.ss$", "", filenames))
+
+#iterate over folders, from each folder pick partitions
+    #from each partition, pick .nex.ss file, do mean.ln.ml() on it -> returns numeric(1)
+  #from each folder, return numeric(len(partitions))
+
+partition <- gsub("^.+_", "", gsub("_ss.nex.ss$", "", filenames))
+
+process.folder <- function(folder.name) {
+  vapply(partition, 
+         FUN = function(partition.name) {
+           ## list.files(.nex.ss), partition.name <- 
+           paste0(folder.name, '/', )
+           return(partition.score)
+         },
+         FUN.VALUE = numeric(1)
+         )
+         
+}
+
+vapply(folders, 
+       FUN=process.folder,
+       FUN.VALUE=numeric(len(partitions))
+         
+       
+       
+  
+)
 
 ```
 
+```{r a mess of vapply()s}
+#vector of folder names in folder datasets
+folder.name <- basename(list.files(".//Datasets"))
+
+#function takes a folder.name vector
+process.folder <- function(folder.name) {
+  partitions <- list.files(path=paste0(".//Datasets//", folder.name)) ##a vector of the folders in each dataset folder
+  vapply(partitions, 
+         FUN = function(partition.name) {
+           partition.score <- mean.ln.ml(list.files(path=paste0(".//Datasets//", folder.name, "//", partition.name), pattern = "_ss.nex.ss$")) 
+           return(partition.score)
+         },
+         FUN.VALUE = numeric(1)
+         )
+         
+}
+
+process.folder(folder.name[1])
+
+vapply(folders, 
+       FUN=process.folder,
+       FUN.VALUE=numeric(len(partitions))
+         
+       
+       
+  
+)
+folder.name1 <- "hyo"
+mean.ln.ml(list.files(path=paste0(".//Datasets//", folder.name1, "//unpart//"), pattern = "_ss.nex.ss$")) 
+```
+
+
+```{r make .sh files from .nex}
+require(stringr)
+#extract file paths of .nex files
+nex_paths <- list.files(pattern=".nex$", recursive=TRUE) 
+
+#keep only the file name
+nex_base <- basename(nex_paths)
+
+#change extension to .sh
+sh_name <- gsub(".nex", ".sh", nex_base)
+
+#get filename without extension
+nex_name <- gsub(".sh", "", sh_name)
+
+#get folder name from first part of filename
+nex_folder <- gsub("_.+_ss$", "", nex_name)
+nex_folder
+
+###write text to .sh files:
+#text to be modified for each file
+sh_txt <- "#!/bin/csh \n cd dataset \n mb filename.nex"
+
+#substitute "dataset" and "filename"
+sh_txt <- str_replace(rep(sh_txt), "filename", nex_name)
+sh_txt <- str_replace(rep(sh_txt), "dataset", nex_folder)
+sh_txt
+
+###^filename should be the same as the elements in nex_name
+###^dataset should be first part of filename (e.g. for weev_unpart_ss.sh -> weev) -> nex_folder
+
+#write files with sh_txt as content, named nex_sh
+lapply(seq_along(sh_name), function(i) {
+    writeLines(sh_txt[i], sh_name[i])
+  }
+)
+invisible()
+
+```
 
