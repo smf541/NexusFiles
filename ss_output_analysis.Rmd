@@ -93,7 +93,7 @@ process.folder <- function(folder.name) {
   partitions <- list.files(path=paste0(".//Datasets//", folder.name)) ##a vector of the folders in each dataset folder
   vapply(partitions, 
          FUN = function(partition.name) {
-           partition.score <- mean.ln.ml(list.files(path=paste0(".//Datasets//", folder.name, "//", partition.name), pattern = "_ss.nex.ss$")) 
+           partition.score <- mean.ln.ml(list.files(pattern = paste0(folder.name, "_", partition.name, "_ss.nex.ss$"), recursive=TRUE))
            return(partition.score)
          },
          FUN.VALUE = numeric(1)
@@ -103,16 +103,15 @@ process.folder <- function(folder.name) {
 
 process.folder(folder.name[1])
 
+###  ^^^  works up to here  ^^^ ###
+
+folders <- basename(list.files(".//Datasets"))
+
 vapply(folders, 
        FUN=process.folder,
-       FUN.VALUE=numeric(len(partitions))
-         
-       
-       
-  
+       FUN.VALUE=numeric(length(partitions))
 )
-folder.name1 <- "hyo"
-mean.ln.ml(list.files(path=paste0(".//Datasets//", folder.name1, "//unpart//"), pattern = "_ss.nex.ss$")) 
+ 
 ```
 
 
