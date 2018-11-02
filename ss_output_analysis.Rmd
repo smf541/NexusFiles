@@ -46,9 +46,8 @@ mean.ln.ml <- function(x) {
     return (NA)
   }
 }
-
-
-
+library(EnvStats)
+geoMean(c(2240, 2640), na.rm=FALSE)
 
 ```
 
