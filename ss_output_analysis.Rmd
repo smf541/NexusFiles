@@ -41,13 +41,16 @@ sum.ln.ml <- function(x) { #x=filename
 #function for finding mean ln marginal likelihood
 mean.ln.ml <- function(x) {
   if (file.exists(x)) {
-    return(mean(sum.ln.ml(x))) #use geometric mean
+    return(mean(sum.ln.ml(x)))
   } else {
     return (NA)
   }
 }
-library(EnvStats)
-geoMean(c(2240, 2640), na.rm=FALSE)
+
+#calculate the geometric mean of likelihood values
+  #same as the arithmetic mean of exponents
+exp <- c(-1617.47, -1612.76, -1559.72, -1615.11)
+mean(exp)
 
 ```
 
@@ -78,11 +81,21 @@ process.folder <- function(folder.name) {
 ### have to run this line before the next vapply ###
 folders <- basename(list.files(".//Datasets"))
 
-vapply(folders, 
+hyoweev <- vapply(folders, 
        FUN=process.folder,
        FUN.VALUE=numeric(length(partition.names))
 )
 ### ^^ the magic spell ^^ ###
+```
+
+```{r build relative marginal likelihood matrix}
+#subtract row "unpart" from each other row/transposed as else it takes the vector away from each column
+rel.matrix <- function(abs.matrix) {
+  rel.likelihoods <- t(abs.matrix) - abs.matrix["unpart",]
+}
+
+#test
+rel.hyoweev <- rel.matrix(hyoweev)
 ```
 
 
