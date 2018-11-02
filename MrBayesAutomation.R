@@ -1,3 +1,4 @@
+#on windows:
 setwd("C:\\Users\\dxsb43\\GitHub\\NexusFiles\\ss_outputs")
 
 #parse .nex.ss file
