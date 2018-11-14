@@ -1,4 +1,4 @@
-[LEGEND: The file contains statistics on the Steppingstone Sampling.]
+﻿[LEGEND: The file contains statistics on the Steppingstone Sampling.]
 [ID: 3469933335]
 [   Step                --  Index of the step ]
 [   Power               --  At each step we sample from the distribution with density (Likelihood^Power)*Prior ]
